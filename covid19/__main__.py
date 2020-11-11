@@ -1,15 +1,15 @@
 import os
-import ssl
 from io import BytesIO
 
 import requests
 from argparse import ArgumentParser
 from pathlib import Path
-import shutil
 import zipfile
+from datetime import datetime
 
 requests.packages.urllib3.disable_warnings()
 requests.packages.urllib3.util.ssl_.DEFAULT_CIPHERS += ':HIGH:!DH:!aNULL'
+
 
 def build_argparser():
     parser = ArgumentParser()
@@ -19,16 +19,18 @@ def build_argparser():
     parser.add_argument("--path", "-p", required=False, type=str,
                         help="Path where data is saved",
                         default='../data')
+    parser.add_argument("--reference_time", "-t", required=False, type=str,
+                        help="Time of day, when data is compared",
+                        default='08:00')
     return parser
 
+
 def download_and_unzip(url, path):
-    from datetime import datetime
-    spec_path = Path(path) / datetime.now().strftime('%Y%m%d%H24%M%S')
+    spec_path = Path(path) / datetime.now().strftime('%Y%m%d%H%M%S')
     if not os.path.exists(spec_path):
         os.mkdir(spec_path)
     filename = url.split('/')[-1]
-    filepath_zip = Path(path) / filename
-    r = requests.get(url,  verify=False, stream=True)
+    r = requests.get(url, verify=False, stream=True)
     with zipfile.ZipFile(BytesIO(r.content), 'r') as zip_file_object:
         zip_file_object.extractall(spec_path)
 
