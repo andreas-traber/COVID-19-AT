@@ -6,6 +6,7 @@ from argparse import ArgumentParser
 from pathlib import Path
 from covid19.connection.gesundheitsministerium import Gesundheitsministerium
 from covid19.evaluation.epikurve import Epikurve
+from covid19.evaluation.todesfaelle import Todesfaelle
 import csv
 
 def build_argparser():
@@ -32,6 +33,7 @@ def main(args):
     logging.basicConfig(format='%(levelname)s: %(message)s', level='INFO')
     gesund = Gesundheitsministerium(args.url, args.path, args.reference_time)
     epi = Epikurve()
+    tod = Todesfaelle()
     if args.download_newest:
         last_path = gesund.download_and_unzip()
     else:
@@ -40,6 +42,9 @@ def main(args):
     diff = epi.calculate_difference(gesund.data_root_path / ref_path, last_path)
     print(diff)
     print(epi.calc_sum(diff))
+    diff = tod.calculate_difference(gesund.data_root_path / ref_path, last_path)
+    print(diff)
+    print(tod.calc_sum(diff))
 
 
 if __name__ == '__main__':

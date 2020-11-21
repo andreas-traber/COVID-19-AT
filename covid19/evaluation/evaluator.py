@@ -41,3 +41,4 @@ class Evaluator:
         for key in p1.keys():
             sum += p1[key]
         return sum
+
