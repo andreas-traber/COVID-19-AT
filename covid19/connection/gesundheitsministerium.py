@@ -6,6 +6,7 @@ import os
 from io import BytesIO
 import zipfile
 import csv
+from pathlib import Path
 
 
 requests.packages.urllib3.disable_warnings()
@@ -31,13 +32,21 @@ class Gesundheitsministerium:
         return spec_path
 
     def get_last_path(self):
+        """
+        deprecated
+        Seems like a bad idea
+        """
         folders = os.listdir(self.data_root_path)
         folders.sort(reverse=True)
         spec_path = self.data_root_path / folders[0]
         logging.info('Last download folder was %s', spec_path)
         return spec_path
 
-    def find_last_folder_with_ref_time(self, folder_before, date_before=datetime.today()):  # - timedelta(days=1)):
+    def find_last_folder_with_ref_time(self, folder_before, date_before=datetime.today(), filename='Epikurve.csv'):  # - timedelta(days=
+        """
+        deprecated
+        Seems like a bad idea
+        """
         folders = os.listdir(self.data_root_path)
         folders.sort(reverse=True)
         reached = False
@@ -45,7 +54,7 @@ class Gesundheitsministerium:
         __folder_before = str(folder_before).split('/')[-1]
         for folder in folders:
             if reached:
-                path_csv = self.data_root_path / folder / 'Epikurve.csv'
+                path_csv = self.data_root_path / folder / filename
                 with open(path_csv) as f:
                     first = True
                     for x in csv.reader(f, delimiter=';'):
@@ -55,6 +64,33 @@ class Gesundheitsministerium:
                         ts = datetime.strptime(x[2], '%Y-%m-%dT%H:%M:%S')
                         break
                     if ts <= ref_time:
+                        return folder
+            else:
+                if folder == __folder_before:
+                    reached = True
+
+
+    def get_first_of_day(self, folder_before=None, day=datetime.today(), filename='Epikurve.csv'):
+        """
+        deprecated
+        Seems like a bad idea
+        """
+        folders = os.listdir(self.data_root_path)
+        folders.sort(reverse=True)
+        reached = folder_before is not None
+        __folder_before = str(folder_before).split('/')[-1]
+        for folder in folders:
+            if reached:
+                path_csv = self.data_root_path / folder / filename
+                with open(path_csv) as f:
+                    first = True
+                    for x in csv.reader(f, delimiter=';'):
+                        if first:
+                            first = False
+                            continue
+                        ts = datetime.strptime(x[2], '%Y-%m-%dT%H:%M:%S')
+                        break
+                    if ts.date() <= day.date():
                         return folder
             else:
                 if folder == __folder_before:
