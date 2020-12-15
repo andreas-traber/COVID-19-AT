@@ -123,7 +123,9 @@ class Evaluator:
             diff_to = diff_from
             diff_from = self.get_first_of_day(diff_to - timedelta(days=1))
             if pd.isnull(diff_from):
-                break
+                diff_from = self.get_first_of_day(diff_to - timedelta(days=2))
+                if pd.isnull(diff_from):
+                    break
 
     def show_data(self):
         print('''-----------------------------
